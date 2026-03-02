@@ -273,10 +273,29 @@ for i, j in enumerate(cosyvoice_zjg.inference_instruct2(text, '用粤语说这�
 
 We provide an OpenAI-compatible API server for easy integration. The server supports zero-shot voice cloning and follows the OpenAI TTS API format.
 
+#### Quick Installation
+
+```bash
+cd CosyVoice2-Yue
+
+# Option 1: One-command installation (recommended)
+./install.sh
+
+# Option 2: Manual installation
+python3.10 -m venv .venv
+source .venv/bin/activate
+pip install 'setuptools<70'  # CRITICAL: Must be first!
+pip install -r requirements.txt
+python fix_deps.py
+```
+
+See [INSTALL.md](CosyVoice2-Yue/INSTALL.md) for detailed installation instructions and troubleshooting.
+
 #### Start the Server
 
 ```bash
 cd CosyVoice2-Yue
+source .venv/bin/activate
 
 # Basic startup (default port: 8201)
 python openai_server.py
@@ -377,30 +396,25 @@ with open("output.wav", "wb") as f:
 | `/v1/voices` | GET | List voice mappings |
 | `/health` | GET | Health check |
 
-See `CosyVoice2-Yue/OPENAI_SERVER.md` for detailed documentation.
+See `CosyVoice2-Yue/OPENAI_SERVER.md` for API documentation and `CosyVoice2-Yue/INSTALL.md` for detailed installation instructions.
 
-#### Troubleshooting
-
-If you encounter errors launching the server:
+#### Quick Troubleshooting
 
 ```bash
-# Run diagnostic script
 cd CosyVoice2-Yue
-python check_server.py
+source .venv/bin/activate
 
-# Common fixes:
-# 1. Install missing dependencies
-pip install -r requirements.txt
+# Run diagnostics
+python diagnose_imports.py
 
-# 2. Download model first if auto-download fails
-python -c "from huggingface_hub import snapshot_download; snapshot_download('ASLP-lab/WSYue-TTS', local_dir='pretrained_models')"
+# Fix dependencies
+python fix_deps.py
 
-# 3. Use HuggingFace model ID directly
-python openai_server.py --model_dir "ASLP-lab/Cosyvoice2-Yue"
-
-# 4. Test without loading model
+# Test without loading model
 python openai_server.py --skip_model_check
 ```
+
+For detailed troubleshooting, see [INSTALL.md](CosyVoice2-Yue/INSTALL.md#troubleshooting).
 
 ## WenetSpeech-Pipe
 
