@@ -46,9 +46,6 @@ pretrained_models/
 # Output files
 output/
 output_*/
-*.wav
-*.mp3
-*.flac
 
 # Logs
 *.log

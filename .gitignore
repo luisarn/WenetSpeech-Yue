@@ -31,6 +31,3 @@ pretrained_models/
 
 # Temp files
 /tmp/
-*.wav
-*.mp3
-*.flac
