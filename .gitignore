@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Model files (large files)
+*.pt
+*.onnx
+*.pth
+*.ckpt
+pretrained_models/
+
+# Temp files
+/tmp/
+*.wav
+*.mp3
+*.flac

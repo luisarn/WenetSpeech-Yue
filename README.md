@@ -269,6 +269,139 @@ for i, j in enumerate(cosyvoice_zjg.inference_instruct2(text, '用粤语说这�
     torchaudio.save('zjg_{}.wav'.format(i), j['tts_speech'], cosyvoice.sample_rate)
 ```
 
+### OpenAI API Server
+
+We provide an OpenAI-compatible API server for easy integration. The server supports zero-shot voice cloning and follows the OpenAI TTS API format.
+
+#### Start the Server
+
+```bash
+cd CosyVoice2-Yue
+
+# Basic startup (default port: 8201)
+python openai_server.py
+
+# With specific model
+python openai_server.py --model_dir pretrained_models/Cosyvoice2-Yue
+
+# Apple Silicon (M1/M2/M3) - use MPS for GPU acceleration
+python openai_server.py --device mps --port 8201
+
+# With optimizations (requires CUDA)
+python openai_server.py --fp16 --load_vllm --port 8201
+```
+
+#### API Usage Examples
+
+**Using OpenAI Python SDK:**
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:8201/v1",
+    api_key="dummy-api-key"  # Not used but required by SDK
+)
+
+response = client.audio.speech.create(
+    model="cosyvoice2-yue",
+    voice="alloy",
+    input="收到朋友从远方寄嚟嘅生日礼物，嗰份意外嘅惊喜同埋深深嘅祝福令我心入面充满咗甜蜜嘅快乐。"
+)
+
+response.stream_to_file("output.mp3")
+```
+
+**Using cURL:**
+
+```bash
+curl -X POST http://localhost:8201/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer dummy-api-key" \
+  -d '{
+    "model": "cosyvoice2-yue",
+    "input": "收到朋友从远方寄嚟嘅生日礼物",
+    "voice": "alloy",
+    "response_format": "mp3"
+  }' \
+  --output output.mp3
+```
+
+**Using the example client:**
+
+```bash
+# Basic synthesis
+python openai_client_example.py --text "你好，世界"
+
+# Synthesize with specific voice
+python openai_client_example.py --voice "nova" --output "nova_output.wav"
+
+# Custom voice cloning with reference audio
+python openai_client_example.py --prompt-audio "asset/sg_017_090.wav" --output "cloned.wav"
+
+# List available voices
+python openai_client_example.py --action list-voices
+```
+
+**Custom voice cloning with base64 audio:**
+
+```python
+import base64
+import requests
+
+with open("reference.wav", "rb") as f:
+    audio_b64 = base64.b64encode(f.read()).decode("utf-8")
+
+response = requests.post(
+    "http://localhost:8201/v1/audio/speech",
+    headers={"Content-Type": "application/json"},
+    json={
+        "model": "cosyvoice2-yue",
+        "input": "你好，世界",
+        "voice": "custom",
+        "prompt_audio": audio_b64,
+        "response_format": "wav"
+    }
+)
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+```
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/audio/speech` | POST | TTS synthesis (OpenAI compatible) |
+| `/v1/models` | GET | List available models |
+| `/v1/voices` | GET | List voice mappings |
+| `/health` | GET | Health check |
+
+See `CosyVoice2-Yue/OPENAI_SERVER.md` for detailed documentation.
+
+#### Troubleshooting
+
+If you encounter errors launching the server:
+
+```bash
+# Run diagnostic script
+cd CosyVoice2-Yue
+python check_server.py
+
+# Common fixes:
+# 1. Install missing dependencies
+pip install -r requirements.txt
+
+# 2. Download model first if auto-download fails
+python -c "from huggingface_hub import snapshot_download; snapshot_download('ASLP-lab/WSYue-TTS', local_dir='pretrained_models')"
+
+# 3. Use HuggingFace model ID directly
+python openai_server.py --model_dir "ASLP-lab/Cosyvoice2-Yue"
+
+# 4. Test without loading model
+python openai_server.py --skip_model_check
+```
+
 ## WenetSpeech-Pipe
 
 WenetSpeech-Pipe Overview:
